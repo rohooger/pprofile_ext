@@ -17,26 +17,27 @@ To load the extension from the IPython REPL or in a notebook cell type and execu
 
 To view the pprofile_ext help type `%pprofile?`, which will display
 
->  %pprofile [-n NAME] [-w WIDTH] [-h HEIGHT] [code [code ...]]
->
->PProfile IPython extension
->
->positional arguments:
->  code
->
->optional arguments:
->  -n NAME, --name NAME  Name of the directory relative to the current notebook
->                        in which to store the profile output and the html
->                        version of the profile output; If the directory does
->                        not exist it will be created. If the directory does
->                        exist a new directory will be created that has a
->                        running integer suffix _x. The default name is
->                        pprofile_output.
->  -w WIDTH, --width WIDTH
->                        Width in pixels of the iframe displaying the pprofile
->                        output; default 980 (used only in cell mode)
->  -h HEIGHT, --height HEIGHT
->                        Height in pixels of the iframe displaying the pprofile
->                        output; default 400 (used only in cell mode)
+<pre>
+%pprofile [-n NAME] [-w WIDTH] [-h HEIGHT] [code [code ...]]
 
+PProfile IPython extension
+
+positional arguments:
+  code
+
+optional arguments:
+  -n NAME, --name NAME  Name of the directory relative to the current notebook
+                        in which to store the profile output and the html
+                        version of the profile output; If the directory does
+                        not exist it will be created. If the directory does
+                        exist a new directory will be created that has a
+                        running integer suffix _x. The default name is
+                        pprofile_output.
+  -w WIDTH, --width WIDTH
+                        Width in pixels of the iframe displaying the pprofile
+                        output; default 980 (used only in cell mode)
+  -h HEIGHT, --height HEIGHT
+                        Height in pixels of the iframe displaying the pprofile
+                        output; default 400 (used only in cell mode)
+</pre>
 
