@@ -51,7 +51,8 @@ def highlight_code(pdict):
     html_code = html_code[is_+len('<pre>'):ie_]
 
     # add back the <div> and <pre> tags, but for every line and add the highlighted code to the pdict
-    hcode = ['<div class="highlight"><pre>{0}</pre></div>'.format(line) for line in html_code.split('\n')]
+    hcode = ['<div class="highlight"><pre>{0}</pre></div>'.format(line.encode('utf-8'))
+             for line in html_code.split('\n')]
     for line, _hcode in itertools.izip(pdict['lines'], hcode):
         line['highlight'] = _hcode
 
@@ -129,8 +130,8 @@ def handle_init(call, line, file):
                 return call
             num -= 1
 
-    else:
-        return call
+    # if this is not a __init__ entry point or we failed to find one, then return the call itself
+    return call
 
 
 def resolve_calls_for_file(file, pdict, filemap):
