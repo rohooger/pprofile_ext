@@ -1,5 +1,4 @@
 import itertools
-import hashlib
 import re
 
 import util
@@ -114,7 +113,7 @@ def file_handler(section):
                                                                                 line_handler))):
             file_dict = util.update(file_dict, fdict)
 
-    yield stuff_in_dict(file_dict, hashlib.sha1(section[0]).hexdigest())
+    yield stuff_in_dict(file_dict, util.hashkey(file_dict['file_summary']['name']) if file_dict else '')
 
 
 def parse_section(section, handlers):
