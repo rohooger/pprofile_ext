@@ -101,7 +101,8 @@ def parse_line(line):
             'time_per_hit': float(columns[3]),
             'percentage': float(columns[4][:-1]),
             'code': '|'.join(columns[5:]),
-            'calls': list()
+            'calls': list(),
+            'calls_from': dict()
             }
 
 
