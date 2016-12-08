@@ -1,12 +1,17 @@
 # pprofile_ext
 IPython extension for the pprofile line-profiler. The extension allows a user to mark a line or cell 
-of an IPython notebook and run the pprofile performance profilers on the marked section of code. The 
-result of the profile run will be written to HTML and can be viewed in any browser. If the extension
-is used from within an IPython notebook then the results are displayed inline in the notebook.
+of an IPython notebook and run the [pprofile](https://github.com/vpelletier/pprofile) performance profiler
+on the marked section of code. The result of the profile run will be written to HTML and can be viewed in
+any browser. If the extension is used from within an IPython notebook then the results are displayed inline
+in the notebook.
 
 ## Installation
 
-TODO
+The `pprofile_ext` ipython extension canbe installed using pip:
+
+```bash
+pip install pprofile_ext
+```
 
 ## Usage
 To load the extension from the IPython REPL or in a notebook cell type and execute
