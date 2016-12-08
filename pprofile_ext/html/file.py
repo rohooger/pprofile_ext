@@ -59,6 +59,18 @@ def highlight_code(pdict):
     return pdict
 
 
+def calls_from(line, max_calls_from=5):
+    # get the 5 most called from lines
+    cfs = sorted([(key, count) for key, count in line['calls_from'].items()],
+                 key=lambda x: x[1], reverse=True)[:max_calls_from]
+
+    tags = [html.href('{0}#line{1}'.format(html.get_html_filename('', file), line),
+                      str(idx + 1)) for idx, ((file, line), cnt) in enumerate(cfs)]
+
+    space = '<div style="display:inline-block;height:12px;width:2px;background-color:#eeeeee";></div>'
+    return space.join(tags)
+
+
 def insert_call_for_line(code, call):
     """
     Replace the call['entry_point'] in `line` with a HTML <a> tag providing a link to the
@@ -220,25 +232,18 @@ def html_file_summary(pdict):
             '<b>Duration (perc)</b> : {0} &#37</br>'.format(pdict['percentage'])]
 
 
-def html_file_most_expensive(pdict, max_lines=10):
-    """
-    Generate the HTML for the most expensive lines section. This includes all the information
-    for the most expensive `max_lines` lines. The line number in the section are HTML link to
-    the actual lines in the source code section.
-
-    :param pdict: profile dictionary
-
-    :return: sequence containing the HTML for the most expensive lines section
-    """
+def get_column_specs(pdict, summary=False):
+    """Return the column specifications for the html table"""
     python_lexer = PythonLexer()
     html_formatter = HtmlFormatter()
 
-    # sort lines by total_time in reverse order
-    sorted_lines = sorted([line for line in pdict['lines']],
-                          key=lambda l: l['total_time'],
-                          reverse=True)[:max_lines]
+    if summary:
+        col2 = lambda l: html.href('#line{0}'.format(l['line_number']), l['line_number'])
+        col8 = lambda l: highlight(l['code'].lstrip(), python_lexer, html_formatter)
+    else:
+        col2 = lambda l: '<a name=line{0}>{0}</a>'.format(l['line_number'])
+        col8 = lambda l: l['highlight']
 
-    # columns_specs for the table columns of the most expensive lines section
     column_specs = (html.column_spec('',
                                      lambda l: html.box(l['time'], l['total_time'],
                                                         pdict['file_summary']['total_time']),
@@ -246,7 +251,7 @@ def html_file_most_expensive(pdict, max_lines=10):
                                      padding_left=0,
                                      padding_right=0),
                     html.column_spec('line',
-                                     lambda l: html.href('#line{0}'.format(l['line_number']), l['line_number']),
+                                     col2,
                                      40),
                     html.column_spec('hits',
                                      lambda l: html.pre('{0}'.format(l['hits'] if l['hits'] > 0 else '')),
@@ -262,12 +267,37 @@ def html_file_most_expensive(pdict, max_lines=10):
                                      lambda l: html.pre('{0:.2e}'.format(l['time_per_hit'])
                                                         if l['time_per_hit'] > 0 else ''),
                                      70),
+                    html.column_spec('called from',
+                                     lambda l: calls_from(l),
+                                     50,
+                                     align='left'),
                     html.column_spec('',
-                                     lambda l: highlight(l['code'].lstrip(), python_lexer, html_formatter),
+                                     col8,
                                      None,
                                      padding_right=0,
                                      align='left')
                     )
+
+    return column_specs
+
+
+def html_file_most_expensive(pdict, max_lines=10):
+    """
+    Generate the HTML for the most expensive lines section. This includes all the information
+    for the most expensive `max_lines` lines. The line number in the section are HTML link to
+    the actual lines in the source code section.
+
+    :param pdict: profile dictionary
+
+    :return: sequence containing the HTML for the most expensive lines section
+    """
+    # sort lines by total_time in reverse order
+    sorted_lines = sorted([line for line in pdict['lines']],
+                          key=lambda l: l['total_time'],
+                          reverse=True)[:max_lines]
+
+    # columns_specs for the table columns of the most expensive lines section
+    column_specs = get_column_specs(pdict, summary=True)
 
     # generate the HTML
     h = html.html()
@@ -298,35 +328,7 @@ def html_file_lines(pdict):
     """
 
     # columns_specs for the table columns of the source section
-    column_specs = (html.column_spec('',
-                                     lambda l: html.box(l['time'], l['total_time'],
-                                                        pdict['file_summary']['total_time']),
-                                     40,
-                                     padding_left=0,
-                                     padding_right=0),
-                    html.column_spec('line',
-                                     lambda l: '<a name=line{0}>{0}</a>'.format(l['line_number']),
-                                     40),
-                    html.column_spec('hits',
-                                     lambda l: html.pre('{0}'.format(l['hits'] if l['hits'] > 0 else '')),
-                                     70),
-                    html.column_spec('total time',
-                                     lambda l: html.pre('{0:.4f}'.format(l['total_time'])
-                                                        if l['total_time'] > 0 else ''),
-                                     70),
-                    html.column_spec('self time',
-                                     lambda l: html.pre('{0:.4f}'.format(l['time']) if l['time'] > 0 else ''),
-                                     70),
-                    html.column_spec('time per hit',
-                                     lambda l: html.pre('{0:.2e}'.format(l['time_per_hit'])
-                                                        if l['time_per_hit'] > 0 else ''),
-                                     70),
-                    html.column_spec('',
-                                     lambda l: l['highlight'],
-                                     None,
-                                     padding_right=0,
-                                     align='left')
-                    )
+    column_specs = get_column_specs(pdict)
 
     # generate the html
     h = html.html()
