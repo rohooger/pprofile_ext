@@ -1,3 +1,5 @@
+from collections import defaultdict
+from functools import partial
 import itertools
 import os
 import os.path
@@ -8,7 +10,50 @@ from html import file
 from html import summary
 
 
-def get_dict(stream):
+def get_reverse_dict(pdict):
+    """
+    Build the reverse call information from the profile dictionary. The reverse
+    call information basically state: this line was called from this other line.
+
+    :param pdict: profile dictionary
+    :return: reverse call dictionary
+    """
+    def update_reverse_call_dict(hashkey, line_number):
+        """Helper function to update the info in the reverse call dictionary"""
+        rdict[hashkey][line_number][(from_file, from_line['line_number'])] += from_line['hits']
+        return rdict
+
+    rdict = defaultdict(partial(defaultdict, (partial(defaultdict, int))))
+    for key, fdict in pdict.items():
+        if key != 'summary':
+            from_file = fdict['file_summary']['name']
+            for from_line in fdict['lines']:
+                for call in from_line['calls']:
+                    rdict = update_reverse_call_dict(util.hashkey(call['file_name']),
+                                                     call['line_number'])
+
+    return rdict
+
+
+def update_profile_dict_with_reverse_dict(pdict, rdict):
+    """
+    Updates the profile information in `pdict` with the reverse call
+    information in `rdict`.
+
+    :param pdict: profile dictionary
+    :param rdict: reverse call dictionary
+    :return: updated profile dictionary
+    """
+    for key, calls_from in rdict.items():
+        if key in pdict:
+            for line in pdict[key]['lines']:
+                if line['line_number'] in calls_from:
+                    line['calls_from'] = calls_from[line['line_number']]
+
+    return pdict
+
+
+def get_profile_dict(stream):
     """
     Consumes the `stream` containing the pprofile output and returns a dictionary containing
     the parsed profile information
@@ -39,7 +84,9 @@ def process_profile(output_dir):
 
     # parse pprofile.txt and create the html output
     with open(pname, 'r') as f:
-        pdict = get_dict(f)
+        pdict = get_profile_dict(f)
+        rdict = get_reverse_dict(pdict)
+        pdict = update_profile_dict_with_reverse_dict(pdict, rdict)
 
         # generate html pages: summary page first
         pdict = summary.html_summary(pdict, output_dir)
