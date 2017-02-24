@@ -1,5 +1,8 @@
 # `pprofile_ext` changelog
 
+### version 1.0.0
+* releasing first pip
+
 ### version 0.0.1
 * adding reverse call information and ability to drill down into call-graph from HTML
 

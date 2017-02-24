@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='pprofile_ext',
-    version='0.0.1',
+    version='1.0.0',
     license='MIT',
 
     author='Ronnie Hoogerwerf',
