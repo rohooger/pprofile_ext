@@ -1,5 +1,9 @@
 # `pprofile_ext` changelog
 
+### version 1.0.1
+* updates to setup.py to include .md and .txt files in distribution
+* adding MANIFEST.in file
+
 ### version 1.0.0
 * releasing first pip
 

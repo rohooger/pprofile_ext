@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='pprofile_ext',
-    version='1.0.0',
+    version='1.0.1',
     license='MIT',
 
     author='Ronnie Hoogerwerf',
@@ -20,6 +20,10 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Topic :: Software Development',
     ],
+
+    package_data={
+        '': ['*.md', '*.txt']
+    },
 
     packages=[
         'pprofile_ext',
