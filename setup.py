@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='pprofile_ext',
-    version='1.0.1',
+    version='1.0.2',
     license='MIT',
 
     author='Ronnie Hoogerwerf',
@@ -14,7 +14,7 @@ setup(
     long_description='',
 
     classifiers=[
-        'Development Status :: 3 = Alpha',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2.7',
