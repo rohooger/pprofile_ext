@@ -8,7 +8,7 @@ from IPython.display import display
 from IPython.display import IFrame
 from IPython.utils.py3compat import unicode_to_str
 
-import driver
+from . import driver
 
 
 def get_arg(arg, cast):

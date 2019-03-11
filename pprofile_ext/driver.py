@@ -4,10 +4,10 @@ import itertools
 import os
 import os.path
 
-import handlers
-import util
-from html import file
-from html import summary
+from pprofile_ext import handlers
+from pprofile_ext import util
+from pprofile_ext.html import file
+from pprofile_ext.html import summary
 
 
 def get_reverse_dict(pdict):

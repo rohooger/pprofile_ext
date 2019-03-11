@@ -120,8 +120,9 @@ def parse_call(line):
     :return: tuple
     """
     columns = line.split('|')
-    file_name, sep, entry_point = columns[5].strip('# ').partition(' ')
-    file_name, sep, line_number = file_name.partition(':')
+    first, sep, second = columns[5].partition(':')
+    line_number, sep, entry_point = second.partition(' ')
+    file_name = first.strip('# ')
 
     return {'hits': int(columns[1]),
             'time': float(columns[2]),

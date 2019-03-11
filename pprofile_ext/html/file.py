@@ -1,11 +1,15 @@
-import itertools
 import re
 
+import six
+from six.moves import zip
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 
 from pprofile_ext import html
+
+PYTHON_LEXER = PythonLexer()
+HTML_FORMATTER = HtmlFormatter()
 
 
 def add_total_time(pdict):
@@ -39,24 +43,34 @@ def highlight_code(pdict):
     :param pdict: profile dict
     :return: profile dict
     """
-    python_lexer, html_formatter = PythonLexer(), HtmlFormatter()
-
     # reconstruct the entire code so that we can get the syntax highlighting of
     # blocks correctly
     html_code = highlight('\n'.join([(l['code'] if len(l['code']) > 0 else ' ') for l in pdict['lines']]),
-                          python_lexer, html_formatter)
+                          PYTHON_LEXER, HTML_FORMATTER)
 
     # strip out the <div> and <pre> tags, we're going to replace them later
     is_, ie_ = html_code.find('<pre>'), html_code.rfind('</pre>')
     html_code = html_code[is_+len('<pre>'):ie_]
 
     # add back the <div> and <pre> tags, but for every line and add the highlighted code to the pdict
-    hcode = ['<div class="highlight"><pre>{0}</pre></div>'.format(line.encode('utf-8'))
+    hcode = ['<div style="margin-top:-8px;margin-bottom:-8px;" class="highlight"><pre>{0}</pre></div>'.format(line.encode('utf-8').decode())
              for line in html_code.split('\n')]
-    for line, _hcode in itertools.izip(pdict['lines'], hcode):
+    for line, _hcode in zip(pdict['lines'], hcode):
         line['highlight'] = _hcode
 
     return pdict
+
+
+def highlight_line(single_line):
+
+    html_code = highlight(single_line, PYTHON_LEXER, HTML_FORMATTER)
+
+    # strip out the <div> and <pre> tags, we're going to replace them later
+    is_, ie_ = html_code.find('<pre>'), html_code.rfind('</pre>')
+    html_code = html_code[is_+len('<pre>'):ie_]
+
+    # add back the <div> and <pre> tags, but for every line and add the highlighted code to the pdict
+    return '<div style="margin-top:-8px;margin-bottom:-8px;" class="highlight"><pre>{0}</pre></div>'.format(html_code.encode('utf-8').decode())
 
 
 def calls_from(line, max_calls_from=5):
@@ -175,9 +189,9 @@ def resolve_calls(pdict):
 
     :return: updated profile dictionary
     """
-    filemap = dict((v['file_summary']['name'], k) for k, v in pdict.iteritems() if k != 'summary')
+    filemap = dict((v['file_summary']['name'], k) for k, v in six.iteritems(pdict) if k != 'summary')
 
-    for file in [file for k, file in pdict.iteritems() if k != 'summary']:
+    for file in [file for k, file in six.iteritems(pdict) if k != 'summary']:
         pdict = resolve_calls_for_file(file, pdict, filemap)
 
     return pdict
@@ -193,7 +207,7 @@ def clean_pdict(pdict):
 
     :return: updated profile dictionary
     """
-    for file in [file for k, file in pdict.iteritems() if k != 'summary']:
+    for file in [file for k, file in six.iteritems(pdict) if k != 'summary']:
         file['lines'] = [line for line in file['lines'] if not line['code'].strip().startswith('(call)')]
 
     return pdict
@@ -234,14 +248,12 @@ def html_file_summary(pdict):
 
 def get_column_specs(pdict, summary=False):
     """Return the column specifications for the html table"""
-    python_lexer = PythonLexer()
-    html_formatter = HtmlFormatter()
 
     if summary:
-        col2 = lambda l: html.href('#line{0}'.format(l['line_number']), l['line_number'])
-        col8 = lambda l: highlight(l['code'].lstrip(), python_lexer, html_formatter)
+        col2 = lambda l: html.div(html.href('#line{0}'.format(l['line_number']), l['line_number']))
+        col8 = lambda l: highlight_line(l['code'].lstrip())
     else:
-        col2 = lambda l: '<a name=line{0}>{0}</a>'.format(l['line_number'])
+        col2 = lambda l: html.div('<a name=line{0}>{0}</a>'.format(l['line_number']))
         col8 = lambda l: l['highlight']
 
     column_specs = (html.column_spec('',
@@ -254,21 +266,21 @@ def get_column_specs(pdict, summary=False):
                                      col2,
                                      40),
                     html.column_spec('hits',
-                                     lambda l: html.pre('{0}'.format(l['hits'] if l['hits'] > 0 else '')),
+                                     lambda l: html.div(html.pre('{0}'.format(l['hits'] if l['hits'] > 0 else ''))),
                                      70),
                     html.column_spec('total time',
-                                     lambda l: html.pre('{0:.4f}'.format(l['total_time'])
-                                                        if l['total_time'] > 0 else ''),
+                                     lambda l: html.div(html.pre('{0:.4f}'.format(l['total_time'])
+                                                                 if l['total_time'] > 0 else '')),
                                      70),
                     html.column_spec('self time',
-                                     lambda l: html.pre('{0:.4f}'.format(l['time']) if l['time'] > 0 else ''),
+                                     lambda l: html.div(html.pre('{0:.4f}'.format(l['time']) if l['time'] > 0 else '')),
                                      70),
                     html.column_spec('time per hit',
-                                     lambda l: html.pre('{0:.2e}'.format(l['time_per_hit'])
-                                                        if l['time_per_hit'] > 0 else ''),
+                                     lambda l: html.div(html.pre('{0:.2e}'.format(l['time_per_hit'])
+                                                                 if l['time_per_hit'] > 0 else '')),
                                      70),
                     html.column_spec('called from',
-                                     lambda l: calls_from(l),
+                                     lambda l: html.div(calls_from(l)),
                                      50,
                                      align='left'),
                     html.column_spec('',
@@ -395,7 +407,7 @@ def html_files(pdict, output_dir):
     pdict = clean_pdict(pdict)
     pdict = resolve_calls(pdict)
 
-    for fdict in (v for k, v in pdict.iteritems() if k != 'summary'):
+    for fdict in (v for k, v in six.iteritems(pdict) if k != 'summary'):
         html_file(fdict, output_dir)
 
     return pdict

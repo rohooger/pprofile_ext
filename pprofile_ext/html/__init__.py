@@ -22,13 +22,13 @@ def box(width, cwidth, max_width, pix_width=100.):
     """
     cw = int(pix_width * cwidth / max_width) if cwidth > 0 else 0
     w = int(pix_width * width / max_width) if width > 0 else 0
-    b1 = '<div style="display:inline-block;height:12px;width:{0}px;background-color:#0000ff";></div>'.format(w)
-    b2 = '<div style="display:inline-block;height:12px;width:{0}px;background-color:#aaaaff";></div>'.format(cw - w)
+    b1 = '<div style="margin-top:-8px;margin-bottom:-8px;display:inline-block;height:12px;width:{0}px;background-color:#0000ff";></div>'.format(w)
+    b2 = '<div style="margin-top:-8px;margin-bottom:-8px;display:inline-block;height:12px;width:{0}px;background-color:#aaaaff";></div>'.format(cw - w)
 
     return b2+b1
 
 
-def column_spec(name, func, width, padding_right=5, padding_left=5, align='right'):
+def column_spec(name, func, width, padding_right=5, padding_left=5, align='right', vertical_align='middle'):
     """
     Returns a function html_table_cell(item, header=False) that generates HTML for table cells
     <td> for header == False and <th> for header == True according to the specification defined
@@ -46,11 +46,11 @@ def column_spec(name, func, width, padding_right=5, padding_left=5, align='right
     def html_table_cell(item, header=False):
 
         if header:
-            return '<th align={0} style="spacing:0;padding-left:{1}px;padding-right:{2}px;" width={3}>{4}</td>'.\
-                   format(align, padding_left, padding_right, width, name)
+            return '<th align={0} vertical-align={5} style="spacing:0;padding-left:{1}px;padding-right:{2}px;" width={3}>{4}</td>'.\
+                   format(align, padding_left, padding_right, width, name, vertical_align)
         else:
-            return '<td align={0} style="spacing:0;padding-left:{1}px;padding-right:{2}px;">{3}</td>'.\
-                   format(align, padding_left, padding_right, func(item))
+            return '<td align={0} vertical-align={4} style="spacing:0;padding-left:{1}px;padding-right:{2}px;">{3}</td>'.\
+                   format(align, padding_left, padding_right, func(item), vertical_align)
 
     return html_table_cell
 
@@ -104,6 +104,13 @@ def hrule():
     HTML horizontal rule tag: <hr>
     """
     return '<hr>'
+
+
+def div(item):
+    """
+    HTML <pre> tag
+    """
+    return '<div style="margin-top:-8px;margin-bottom:-8px;">{0}</div>'.format(item)
 
 
 def pre(item):
