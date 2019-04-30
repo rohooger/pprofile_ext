@@ -127,7 +127,7 @@ def compile_code(code, output_dir):
 
     pcode = ['import pprofile',
              'profiler = pprofile.Profile()',
-             'with profiler:']
+             'with profiler():']
 
     pcode += indent_code(code)
     pcode += ["profiler.dump_stats('{0}')".format(pname)]
