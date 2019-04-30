@@ -1,8 +1,8 @@
 import itertools
 import re
 
-import util
-import parsers
+from pprofile_ext import util
+from pprofile_ext import parsers
 
 RE_LINE = re.compile(r'\s*\d+\|')
 RE_CALL = re.compile(r'\s*\(call\)\|')

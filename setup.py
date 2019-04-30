@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='pprofile_ext',
-    version='1.0.3',
+    version='1.0.4',
     license='MIT',
 
     author='Ronnie Hoogerwerf',
@@ -32,6 +32,7 @@ setup(
 
     # dependencies
     install_requires=[
+        'six',
         'pprofile>=1.7.3',
         'pygments>=2.0.0',
     ]
