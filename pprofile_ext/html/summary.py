@@ -1,5 +1,7 @@
 import os.path
 
+import six
+
 from pprofile_ext import html
 
 
@@ -11,7 +13,7 @@ def sorted_files(pdict):
 
     :return: sorted list of file_summary dicts
     """
-    return sorted([v['file_summary'] for k, v in pdict.iteritems() if k != 'summary'],
+    return sorted([v['file_summary'] for k, v in six.iteritems(pdict) if k != 'summary'],
                   key=lambda f: f['duration'], reverse=True)
 
 

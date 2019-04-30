@@ -8,7 +8,7 @@ from IPython.display import display
 from IPython.display import IFrame
 from IPython.utils.py3compat import unicode_to_str
 
-import driver
+from . import driver
 
 
 def get_arg(arg, cast):
@@ -61,7 +61,13 @@ class PProfileMagics(Magics):
 
         # compile the code block and execute the code block
         ccode = driver.compile_code(code, output_dir)
-        self.shell.run_code(ccode)
+        status = self.shell.run_code(ccode)
+        # as of ipython 7.5.0 the run_code was wrapped in a coroutine.
+        #   https://github.com/ipython/ipython/commit/f384e255144b97194cff1de9cb57a7dfca6f2547
+        # so check type of status and if it is not a bool "list" the generator that is returned
+        #   by run_code
+        if not isinstance(status, bool):
+            status = list(status)
 
         # process the profile output and return an IFrame to display the profile information in
         uri = driver.process_profile(output_dir)

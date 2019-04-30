@@ -32,6 +32,7 @@ setup(
 
     # dependencies
     install_requires=[
+        'six',
         'pprofile>=1.7.3',
         'pygments>=2.0.0',
     ]
