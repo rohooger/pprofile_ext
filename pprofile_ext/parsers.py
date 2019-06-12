@@ -120,7 +120,7 @@ def parse_call(line):
     :return: tuple
     """
     columns = line.split('|')
-    first, sep, second = columns[5].partition(':')
+    first, sep, second = columns[5].rpartition(':')
     line_number, sep, entry_point = second.partition(' ')
     file_name = first.strip('# ')
 

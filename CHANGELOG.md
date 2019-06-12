@@ -1,5 +1,11 @@
 # `pprofile_ext` changelog
 
+### version 1.0.5
+* parser fix to deal with extracting line-number from decorator reference
+
+### version 1.0.4
+* add python3 compatibility
+
 ### version 1.0.2
 * fixing typo in setup.py
 
